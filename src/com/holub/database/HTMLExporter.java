@@ -21,7 +21,7 @@ public class HTMLExporter implements Table.Exporter {
 	{	
 		this.width = width;
 		out.write(tableName == null ? "<anonymous>" : tableName );
-		out.write("<br>");
+		out.write("<p>");
 		storeRow( columnNames ); // comma separated list of columns ids
 }
 
@@ -33,13 +33,15 @@ public class HTMLExporter implements Table.Exporter {
 			// Null columns are represented by an empty field
 			// (two commas in a row). There's nothing to write
 			// if the column data is null.
-			if( datum != null )	
+			if( datum != null )	{
 				out.write( datum.toString() );
+			}
 
-			if( --i > 0 )
-				out.write(",\t");
+			if( --i > 0 ) {
+				out.write("&emsp;/&emsp;");
+			}
 		}
-		out.write("\n");
+		out.write("<br>");
 	}
 	
 	@Override
