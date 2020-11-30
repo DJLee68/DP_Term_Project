@@ -34,6 +34,7 @@ public class HTMLExporter implements Table.Exporter {
 			// (two commas in a row). There's nothing to write
 			// if the column data is null.
 			if( datum != null )	{
+				System.out.println(datum.toString());
 				out.write( datum.toString() );
 			}
 
@@ -41,6 +42,7 @@ public class HTMLExporter implements Table.Exporter {
 				out.write("&emsp;/&emsp;");
 			}
 		}
+		System.out.println();
 		out.write("<br>");
 	}
 	
