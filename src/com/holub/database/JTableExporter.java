@@ -103,16 +103,16 @@ public class JTableExporter implements Table.Exporter
 	public static class Test
 	{ 	public static void main( String[] args ) throws IOException
 		{	
-			Table people = TableFactory.create( "people",
-						   new String[]{ "First", "Last"		} );
-			people.insert( new String[]{ "Allen",	"Holub" 	} );
-			people.insert( new String[]{ "Ichabod",	"Crane" 	} );
-			people.insert( new String[]{ "Rip",		"VanWinkle" } );
-			people.insert( new String[]{ "Goldie",	"Locks" 	} );
+//			Table people = TableFactory.create( "people",
+//						   new String[]{ "First", "Last"		} );
+//			people.insert( new String[]{ "Allen",	"Holub" 	} );
+//			people.insert( new String[]{ "Ichabod",	"Crane" 	} );
+//			people.insert( new String[]{ "Rip",		"VanWinkle" } );
+//			people.insert( new String[]{ "Goldie",	"Locks" 	} );
 
 			javax.swing.JFrame frame = new javax.swing.JFrame();
 			frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-
+			Table people = TableFactory.create(new XMLImporter("people.xml"));
 			JTableExporter tableBuilder = new JTableExporter();
 			people.export( tableBuilder );
 

@@ -132,8 +132,9 @@ public class XMLExporter implements Table.Exporter {
 			people.insert( new String[]{ "Allen",	"Holub" 	} );
 			people.insert( new String[]{ "Ichabod",	"Crane" 	} );
 			people.insert( new String[]{ "Rip",		"VanWinkle" } );
-			people.insert( new String[]{ "Goldie",	"Locks" 	} );
+			people.insert( new String[]{ "Goldie",	"dj" 	} );
 		    
+//			Table people = TableFactory.create(new XMLImporter("people.xml"));
 			XMLExporter tableBuilder = new XMLExporter();
 			
             people.export( tableBuilder );
