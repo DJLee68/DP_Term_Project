@@ -28,6 +28,7 @@ public class XMLExporter implements Table.Exporter {
 	private Element column;
 	private Element row;
 	private boolean isColumn = true;
+	private int row_cnt = 1;
 	
 	public XMLExporter() {
 		docFactory = DocumentBuilderFactory.newInstance();
@@ -58,17 +59,15 @@ public class XMLExporter implements Table.Exporter {
 		document.appendChild(table);
 		
 		column = document.createElement("column");
-		row = document.createElement("row");
 		table.appendChild(column);
-		table.appendChild(row);
 		storeRow( columnNames); // comma separated list of columns ids
 		
 }
 
 	public void storeRow(Iterator data) throws IOException
 	{	
-		int i = width;
-		Element row_element = document.createElement("row_element");
+		Element row_element = document.createElement("row");
+		row_element.setAttribute("num", Integer.toString(row_cnt));
 		int col_cnt = 1;
 		while(data.hasNext()) {
 			Object datum = data.next();
@@ -76,20 +75,24 @@ public class XMLExporter implements Table.Exporter {
 				if(datum!=null && isColumn) {
 					// column 엘리먼트
 		            Element col_name = document.createElement("column_name");
-		            col_name.appendChild(document.createTextNode(datum.toString()));
+		            col_name.setAttribute("value", datum.toString());
 		            column.appendChild(col_name);
 				}
 				else {
 					//row element
 					Element row_value = document.createElement("column"+col_cnt);
 					col_cnt++;
-					row_value.appendChild(document.createTextNode(datum.toString()));
+					row_value.setAttribute("value", datum.toString());
 					row_element.appendChild(row_value);
 				}
 			}
 		}
-		if(row_element.hasChildNodes()) row.appendChild(row_element);
 		isColumn = false;
+		if(row_element.hasChildNodes()) {
+			row_cnt++;
+			table.appendChild(row_element);
+		}
+		
 	}
 	
 	public void endTable() throws IOException {

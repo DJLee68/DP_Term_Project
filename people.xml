@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <table name="people">
     <column>
-        <column_name>First</column_name>
-        <column_name>Last</column_name>
+        <column_name value="First"/>
+        <column_name value="Last"/>
     </column>
-    <row>
-        <row_element>
-            <column1>Allen</column1>
-            <column2>Holub</column2>
-        </row_element>
-        <row_element>
-            <column1>Ichabod</column1>
-            <column2>Crane</column2>
-        </row_element>
-        <row_element>
-            <column1>Rip</column1>
-            <column2>VanWinkle</column2>
-        </row_element>
-        <row_element>
-            <column1>Goldie</column1>
-            <column2>Locks</column2>
-        </row_element>
+    <row num="1">
+        <column1 value="Allen"/>
+        <column2 value="Holub"/>
+    </row>
+    <row num="2">
+        <column1 value="Ichabod"/>
+        <column2 value="Crane"/>
+    </row>
+    <row num="3">
+        <column1 value="Rip"/>
+        <column2 value="VanWinkle"/>
+    </row>
+    <row num="4">
+        <column1 value="Goldie"/>
+        <column2 value="Locks"/>
     </row>
 </table>

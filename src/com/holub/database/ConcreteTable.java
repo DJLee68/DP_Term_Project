@@ -101,7 +101,7 @@ import com.holub.tools.ArrayIterator;
 		tableName = importer.loadTableName();
 		int width = importer.loadWidth();
 		Iterator columns = importer.loadColumnNames();
-
+		
 		this.columnNames = new String[width];
 		for (int i = 0; columns.hasNext();)
 			columnNames[i++] = (String) columns.next();
@@ -119,10 +119,9 @@ import com.holub.tools.ArrayIterator;
 	public void export(Table.Exporter exporter) throws IOException {
 		exporter.startTable();
 		exporter.storeMetadata(tableName, columnNames.length, rowSet.size(), new ArrayIterator(columnNames));
-
-		for (Iterator i = rowSet.iterator(); i.hasNext();)
+		
+		for (Iterator i = rowSet.iterator(); i.hasNext();) 
 			exporter.storeRow(new ArrayIterator((Object[]) i.next()));
-
 		exporter.endTable();
 		isDirty = false;
 	}

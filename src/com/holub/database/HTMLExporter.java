@@ -22,7 +22,8 @@ public class HTMLExporter implements Table.Exporter {
 		this.width = width;
 		out.write(tableName == null ? "<anonymous>" : tableName );
 		out.write("<p>");
-		storeRow( columnNames ); // comma separated list of columns ids
+		
+//		storeRow( columnNames ); // comma separated list of columns ids
 }
 
 	public void storeRow( Iterator data ) throws IOException
@@ -34,7 +35,6 @@ public class HTMLExporter implements Table.Exporter {
 			// (two commas in a row). There's nothing to write
 			// if the column data is null.
 			if( datum != null )	{
-				System.out.println(datum.toString());
 				out.write( datum.toString() );
 			}
 
@@ -42,7 +42,6 @@ public class HTMLExporter implements Table.Exporter {
 				out.write("&emsp;/&emsp;");
 			}
 		}
-		System.out.println();
 		out.write("<br>");
 	}
 	
