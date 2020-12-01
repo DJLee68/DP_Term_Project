@@ -541,7 +541,9 @@ public final class Database
 	 *  overwritten.
 	 */
 	public void createTable( String name, List columns )
-	{	String[] columnNames = new String[ columns.size() ];
+	{	
+		System.out.println(columns.size());
+		String[] columnNames = new String[ columns.size() ];
 		int i = 0;
 		for( Iterator names = columns.iterator(); names.hasNext(); )
 			columnNames[i++] = (String) names.next();

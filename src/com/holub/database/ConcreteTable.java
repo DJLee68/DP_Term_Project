@@ -441,8 +441,11 @@ import com.holub.tools.ArrayIterator;
 	/**
 	 * This version of select does a join
 	 */
+	
+	// HERE!!!
 	public Table select(Selector where, String[] requestedColumns, // {=ConcreteTable.select.default}
 			Table[] otherTables) {
+
 		// If we're not doing a join, use the more efficient version
 		// of select().
 

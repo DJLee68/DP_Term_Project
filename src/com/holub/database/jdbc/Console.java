@@ -44,6 +44,7 @@ import java.sql.*;
  * @include /etc/license.txt
  */
 
+// select * from address, name where address,addrld = name.addrld
 public class Console
 {
 	private static final String driverName = "com.holub.database.jdbc.JDBCDriver";
@@ -77,6 +78,7 @@ public class Console
 	//----------------------------------------------------------------------
 	public Console()
 	{	try
+	
 		{	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 
 			Class.forName( driverName ).newInstance();
@@ -265,6 +267,8 @@ public class Console
 	}
 	//----------------------------------------------------------------------
 	public static void main(String[] args) throws Exception
-	{	new Console();
+	
+	{	System.out.println("hi");
+		new Console();
 	}
 }
