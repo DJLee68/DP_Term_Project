@@ -404,6 +404,7 @@ import com.holub.tools.ArrayIterator;
 	// @select-start
 	// ----------------------------------------------------------------------
 	public Table select(Selector where) {
+		System.out.println("zz");
 		Table resultTable = new ConcreteTable(null, (String[]) columnNames.clone());
 
 		Results currentRow = (Results) rows();
@@ -418,6 +419,7 @@ import com.holub.tools.ArrayIterator;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public Table select(Selector where, String[] requestedColumns) {
+		System.out.println("col:"+requestedColumns);
 		if (requestedColumns == null)
 			return select(where);
 
@@ -441,35 +443,72 @@ import com.holub.tools.ArrayIterator;
 	/**
 	 * This version of select does a join
 	 */
-	
+
+	public Table select(Selector where, Table[] otherTables) {
+
+		// If we're not doing a join, use the more efficient version
+		// of select().
+		System.out.println(requestedColumns);
+		System.out.println("herer");
+		if (otherTables == null || otherTables.length == 0)
+			return select(where, requestedColumns);
+
+		// Make the current table not be a special case by effectively
+		// prefixing it to the otherTables array.
+		System.out.println(2);
+		Table[] allTables = new Table[otherTables.length + 1];
+		System.out.println(3);
+		allTables[0] = this;
+		System.out.println(4);
+		System.arraycopy(otherTables, 0, allTables, 1, otherTables.length);
+		System.out.println(5);
+		// Create places to hold the result of the join and to hold
+		// iterators for each table involved in the join.
+		Table resultTable = new ConcreteTable(null, requestedColumns);
+		
+		System.out.println(6);
+		Cursor[] envelope = new Cursor[allTables.length];
+		System.out.println(7);
+		// Recursively compute the Cartesian product, adding to the
+		// resultTable all rows that the Selector approves
+
+		selectFromCartesianProduct(0, where, requestedColumns, allTables, envelope, resultTable);
+		System.out.println(8);
+		return new UnmodifiableTable(resultTable);
+	}
+
 	// HERE!!!
 	public Table select(Selector where, String[] requestedColumns, // {=ConcreteTable.select.default}
 			Table[] otherTables) {
 
 		// If we're not doing a join, use the more efficient version
 		// of select().
-
+		System.out.println(requestedColumns);
+		System.out.println("herer");
 		if (otherTables == null || otherTables.length == 0)
 			return select(where, requestedColumns);
 
 		// Make the current table not be a special case by effectively
 		// prefixing it to the otherTables array.
-
+		System.out.println(2);
 		Table[] allTables = new Table[otherTables.length + 1];
+		System.out.println(3);
 		allTables[0] = this;
+		System.out.println(4);
 		System.arraycopy(otherTables, 0, allTables, 1, otherTables.length);
-
+		System.out.println(5);
 		// Create places to hold the result of the join and to hold
 		// iterators for each table involved in the join.
-
 		Table resultTable = new ConcreteTable(null, requestedColumns);
+		
+		System.out.println(6);
 		Cursor[] envelope = new Cursor[allTables.length];
-
+		System.out.println(7);
 		// Recursively compute the Cartesian product, adding to the
 		// resultTable all rows that the Selector approves
 
 		selectFromCartesianProduct(0, where, requestedColumns, allTables, envelope, resultTable);
-
+		System.out.println(8);
 		return new UnmodifiableTable(resultTable);
 	}
 
@@ -557,12 +596,11 @@ import com.holub.tools.ArrayIterator;
 	public Table select(Selector where, Collection requestedColumns, Collection other) {
 		String[] columnNames = null;
 		Table[] otherTables = null;
-
+	
 		if (requestedColumns != null) // SELECT *
 		{
 			// Can't cast an Object[] to a String[], so make a copy to ensure
 			// type safety.
-
 			columnNames = new String[requestedColumns.size()];
 			int i = 0;
 			Iterator column = requestedColumns.iterator();
