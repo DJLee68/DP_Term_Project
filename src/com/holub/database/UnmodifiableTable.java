@@ -83,6 +83,9 @@ public class UnmodifiableTable implements Table
 	public Table select(Selector w,String[] r,Table[] o)
 	{	return wrapped.select( w, r, o );
 	}
+	public Table select(Selector where, Table[] otherTables) {
+		return wrapped.select(where, otherTables);
+	}
 	public Table select(Selector where, String[] requestedColumns)
 	{	return wrapped.select(where, requestedColumns );
 	}
@@ -114,4 +117,12 @@ public class UnmodifiableTable implements Table
 	 *  that was passed to the constructor. Use the method with care.
 	 */
 	public Table extract(){ return wrapped;	}
+
+	@Override
+	public String[] get_columnNames() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 }

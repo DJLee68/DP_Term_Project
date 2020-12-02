@@ -218,6 +218,10 @@ public interface Table extends Serializable, Cloneable
 	/** A more efficient version of
 	 * <code>select(where, requestedColumns, null);</code>
 	 */
+	
+	
+	public String[] get_columnNames();
+	Table select(Selector where, Table[] otherTables);
 	Table select(Selector where, String[] requestedColumns );
 
 	/** A more efficient version of <code>select(where, null, null);</code>

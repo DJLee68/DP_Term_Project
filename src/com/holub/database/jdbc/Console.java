@@ -44,7 +44,7 @@ import java.sql.*;
  * @include /etc/license.txt
  */
 
-// select * from address, name where address,addrld = name.addrld
+// select * from address, name where address.addrId = name.addrId
 public class Console
 {
 	private static final String driverName = "com.holub.database.jdbc.JDBCDriver";
