@@ -214,7 +214,6 @@ public interface Table extends Serializable, Cloneable
 	 */
 
 	Table select(Selector where, String[] requestedColumns, Table[] other);
-
 	/** A more efficient version of
 	 * <code>select(where, requestedColumns, null);</code>
 	 */

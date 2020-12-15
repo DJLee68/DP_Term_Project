@@ -424,9 +424,9 @@ import com.holub.tools.ArrayIterator;
 		
 		if (requestedColumns == null)
 			return select(where);
-
+		
+		System.out.println("hi2");
 		Table resultTable = new ConcreteTable(null, (String[]) requestedColumns.clone());
-
 		Results currentRow = (Results) rows();
 		Cursor[] envelope = new Cursor[] { currentRow };
 
@@ -507,6 +507,7 @@ import com.holub.tools.ArrayIterator;
 		return new UnmodifiableTable(resultTable);
 	}
 
+	
 	/**
 	 * Think of the Cartesian product as a kind of tree. That is given one table
 	 * with rows A and B, and another table with rows C and D, you can look at the
@@ -970,4 +971,5 @@ import com.holub.tools.ArrayIterator;
 			}
 		}
 	}
+
 }

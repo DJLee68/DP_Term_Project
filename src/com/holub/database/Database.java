@@ -402,7 +402,8 @@ public final class Database
 		USE			= tokens.create( "'USE"		),
 		VALUES 		= tokens.create( "'VALUES"	),
 		WHERE		= tokens.create( "'WHERE"	),
-
+		KEYWORD     = tokens.create( "distinct|orderby|groupby"),
+		
 		WORK		= tokens.create( "WORK|TRAN(SACTION)?"		),
 		ADDITIVE	= tokens.create( "\\+|-" 					),
 		STRING		= tokens.create( "(\".*?\")|('.*?')"		),
@@ -1274,34 +1275,46 @@ public final class Database
 	// strings, table.column). The implementors of Value provide
 	// convenience methods for using those operands.
 	//
-	private interface Value	// tagging interface
+	public interface Value	// tagging interface
 	{
+		public void accept(ValueVisitor visitor);
 	}
 	//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static class NullValue implements Value
-	{	public String toString(){ return null; }
+	{	
+		public String toString(){ return null; }
+		public void accept(ValueVisitor visitor) {
+			visitor.visit(this);
+		}
 	}
 	//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static final class BooleanValue implements Value
-	{	boolean value;
+	{	public boolean value;
 		public BooleanValue( boolean value )
 		{	this.value = value;
 		}
 		public boolean	value()	  { return value; }
-		public String	toString(){ return String.valueOf(value); };
+		public String	toString(){ return String.valueOf(value); }
+		
+		public void accept(ValueVisitor visitor) {
+			visitor.visit(this);
+		}
 	}
 	//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	private static class StringValue implements Value
-	{	private String value;
+	public static class StringValue implements Value
+	{	public String value;
 		public StringValue(String lexeme)
 		{	value = lexeme.replaceAll("['\"](.*?)['\"]", "$1" );
 		}
 		public String value()	{ return value; }
 		public String toString(){ return value; }
+		public void accept(ValueVisitor visitor) {
+			visitor.visit(this);
+		}
 	}
 	//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private final class NumericValue implements Value
-	{	private double value;
+	{	public double value;
 		public NumericValue(double value)	// initialize from a double.
 		{	this.value = value;
 		}
@@ -1318,12 +1331,15 @@ public final class Database
 			else
 				return String.valueOf( value );
 		}
+		public void accept(ValueVisitor visitor) {
+			visitor.visit(this);
+		}
 	}
 	//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private final class IdValue implements Value
 	{	String tableName;
 		String columnName;
-
+		public Object value = null;
 		public IdValue(String tableName, String columnName)
 		{	this.tableName  = tableName;
 			this.columnName = columnName;
@@ -1361,7 +1377,7 @@ public final class Database
 			// All table contents are converted to Strings, whatever
 			// their original type. This conversion can cause
 			// problems if the table was created manually.
-
+			if(content!=null) value = content.toString();
 			return (content == null) ? null : content.toString();
 		}
 
@@ -1385,6 +1401,37 @@ public final class Database
 			}
 			return new StringValue( s );
 		}
+		public void accept(ValueVisitor visitor) {
+			visitor.visit(this);
+		}
+	}
+	
+	public interface ValueVisitor{
+		public void visit(NullValue nullvalue);
+		public void visit(BooleanValue booleanvalue);
+		public void visit(NumericValue numericvalue);
+		public void visit(StringValue stringvalue);
+		public void visit(IdValue idvalue);
+	}
+	
+	public static class PrintVisitor implements ValueVisitor{
+		
+		public void visit(NullValue nullvalue) {
+			System.out.println("Null Value");
+		}
+		public void visit(BooleanValue booleanvalue) {
+			System.out.println("Boolean Value: "+booleanvalue.value);
+		}
+		public void visit(NumericValue numericvalue) {
+			System.out.println("Numveric Value: "+numericvalue.value);
+		}
+		public void visit(StringValue stringvalue) {
+			System.out.println("String Value: "+stringvalue.value);
+		}
+		public void visit(IdValue idvalue) {
+			System.out.println("IdValue Value: "+idvalue.value);
+		}
+		
 	}
 	//@value-end
 	//@workhorse-start
@@ -1581,6 +1628,10 @@ public final class Database
 
 			theDatabase.dump();
 			System.out.println("Database PASSED");
+			
+			// TEST for Visitor
+			Value stringvalue = new StringValue("hi");
+			stringvalue.accept(new PrintVisitor());
 			System.exit(0);
 		}
 	}

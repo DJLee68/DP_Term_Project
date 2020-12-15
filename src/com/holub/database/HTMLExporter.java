@@ -65,7 +65,6 @@ public class HTMLExporter implements Table.Exporter {
 			people.export( tableBuilder );
 
 			out.close();
-			
 		}
 	}
 }

@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
  
-
 public class XMLExporter implements Table.Exporter {
 	private 	  int	 width;
 	private Document document;
@@ -42,7 +41,6 @@ public class XMLExporter implements Table.Exporter {
 			e.printStackTrace();
 		}
 	}
-	
 	
 	public void startTable() throws IOException {}
 
@@ -106,8 +104,6 @@ public class XMLExporter implements Table.Exporter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4"); //정렬 스페이스4칸
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");

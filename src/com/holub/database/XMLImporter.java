@@ -142,6 +142,8 @@ public class XMLImporter implements Importer {
 		{	
 			
 			Table t = TableFactory.create(new XMLImporter("people.xml"));
+			
+			//Junit Test(직접 만든 테이블과 비교?)
 						
 		}
 	}
