@@ -507,6 +507,29 @@ import com.holub.tools.ArrayIterator;
 		return new UnmodifiableTable(resultTable);
 	}
 
+	public Table select(Selector where, String keyword, String[] requestedColumns, // {=ConcreteTable.select.default}
+			Table[] otherTables) {
+
+		// If we're not doing a join, use the more efficient version
+		// of select().
+		if (keyword==null) return select(where, requestedColumns, otherTables);
+		System.out.println("zz");
+		// Make the current table not be a special case by effectively
+		// prefixing it to the otherTables array.
+		Table[] allTables = new Table[otherTables.length + 1];
+		allTables[0] = this;
+		System.arraycopy(otherTables, 0, allTables, 1, otherTables.length);
+		// Create places to hold the result of the join and to hold
+		// iterators for each table involved in the join.
+		Table resultTable = new ConcreteTable(null, requestedColumns);
+		
+		Cursor[] envelope = new Cursor[allTables.length];
+		// Recursively compute the Cartesian product, adding to the
+		// resultTable all rows that the Selector approves
+
+		selectFromCartesianProduct(0, where, requestedColumns, allTables, envelope, resultTable);
+		return new UnmodifiableTable(resultTable);
+	}
 	
 	/**
 	 * Think of the Cartesian product as a kind of tree. That is given one table
@@ -589,7 +612,13 @@ import com.holub.tools.ArrayIterator;
 	 *                            collection do not implement the {@link Table}
 	 *                            interface.
 	 */
+	
 	public Table select(Selector where, Collection requestedColumns, Collection other) {
+		// TODO Auto-generated method stub
+		return select(where, requestedColumns, other);
+	}
+	
+	public Table select(Selector where, String keyword, Collection requestedColumns, Collection other) {
 		String[] columnNames = null;
 		Table[] otherTables = null;
 	
@@ -608,7 +637,7 @@ import com.holub.tools.ArrayIterator;
 		if (other != null)
 			otherTables = (Table[]) other.toArray(new Table[other.size()]);
 
-		return select(where, columnNames, otherTables);
+		return select(where, keyword, columnNames, otherTables);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -877,7 +906,7 @@ import com.holub.tools.ArrayIterator;
 						public boolean approve(Cursor[] tables) {
 							return tables[0].column("addrId").equals(tables[1].column("addrId"));
 						}
-					}, columns, tables);
+					}, "", columns, tables);
 
 			print(result);
 			System.out.println("");

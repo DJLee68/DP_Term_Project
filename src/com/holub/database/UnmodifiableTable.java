@@ -124,5 +124,17 @@ public class UnmodifiableTable implements Table
 		return null;
 	}
 
+	@Override
+	public Table select(Selector where, String keyword, String[] requestedColumns, Table[] other) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Table select(Selector selector, String keyword, Collection columns, Collection participantsInJoin) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 }

@@ -402,7 +402,9 @@ public final class Database
 		USE			= tokens.create( "'USE"		),
 		VALUES 		= tokens.create( "'VALUES"	),
 		WHERE		= tokens.create( "'WHERE"	),
-		KEYWORD     = tokens.create( "distinct|orderby|groupby"),
+		DISTINCT    = tokens.create( "'distinct"),
+		ORDERBY     = tokens.create( "'order by"),
+		GROUPBY     = tokens.create( "'group by"),
 		
 		WORK		= tokens.create( "WORK|TRAN(SACTION)?"		),
 		ADDITIVE	= tokens.create( "\\+|-" 					),
@@ -799,9 +801,23 @@ public final class Database
 			affectedRows = doDelete( tableName, expr() );
 		}
 		else if( in.matchAdvance(SELECT) != null )
-		{	List columns = idList();
-
+		{	
+			String keyword = null;
+			if( in.matchAdvance(DISTINCT) != null) {
+				keyword = "distinct";
+			}
+			if( in.matchAdvance(ORDERBY) != null) {
+				keyword = "orderby";
+			}
+			if( in.matchAdvance(GROUPBY) != null) {
+				keyword = "groupby";
+			}
+			List columns = idList();
+			System.out.println(keyword);
 			String into = null;
+			
+			System.out.println("az");
+			
 			if( in.matchAdvance(INTO) != null )
 				into = in.required(IDENTIFIER);
 
@@ -810,7 +826,7 @@ public final class Database
 
 			Expression where = (in.matchAdvance(WHERE) == null)
 								? null : expr();
-			Table result = doSelect(columns, into,
+			Table result = doSelect(columns, keyword, into,
 								requestedTableNames, where );
 			return result;
 		}
@@ -1438,7 +1454,7 @@ public final class Database
 	//======================================================================
 	// Workhorse methods called from the parser.
 	//
-	private Table doSelect( List columns, String into,
+	private Table doSelect( List columns, String keyword, String into,
 										List requestedTableNames,
 										final Expression where )
 										throws ParseFailure
@@ -1484,7 +1500,7 @@ public final class Database
 			};
 
 		try
-		{	Table result = primary.select(selector, columns, participantsInJoin);
+		{	Table result = primary.select(selector, keyword, columns, participantsInJoin);
 
 			// If this is a "SELECT INTO <table>" request, remove the 
 			// returned table from the UnmodifiableTable wrapper, give

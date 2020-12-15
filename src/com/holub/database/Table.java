@@ -212,7 +212,7 @@ public interface Table extends Serializable, Cloneable
 	 * 		product of this table and the <code>other</code> table
 	 * 		that were accepted by the {@link Selector}.
 	 */
-
+	Table select(Selector where, String keyword, String[] requestedColumns, Table[] other);
 	Table select(Selector where, String[] requestedColumns, Table[] other);
 	/** A more efficient version of
 	 * <code>select(where, requestedColumns, null);</code>
@@ -292,4 +292,6 @@ public interface Table extends Serializable, Cloneable
 		Iterator loadRow()			throws IOException;
 		void 	 endTable()			throws IOException;
 	}
+
+	Table select(Selector selector, String keyword, Collection columns, Collection participantsInJoin);
 }
