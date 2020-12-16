@@ -245,6 +245,7 @@ public interface Table extends Serializable, Cloneable
 
 	/** Return an iterator across the rows of the current table.
 	 */
+	Table select(Selector selector, String keyword, Collection columns, Collection participantsInJoin);
 	Cursor rows();
 
 	/** Build a representation of the Table using the
@@ -293,5 +294,4 @@ public interface Table extends Serializable, Cloneable
 		void 	 endTable()			throws IOException;
 	}
 
-	Table select(Selector selector, String keyword, Collection columns, Collection participantsInJoin);
 }

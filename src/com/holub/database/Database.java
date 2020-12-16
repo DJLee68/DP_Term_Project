@@ -403,8 +403,8 @@ public final class Database
 		VALUES 		= tokens.create( "'VALUES"	),
 		WHERE		= tokens.create( "'WHERE"	),
 		DISTINCT    = tokens.create( "'distinct"),
-		ORDERBY     = tokens.create( "'order by"),
-		GROUPBY     = tokens.create( "'group by"),
+		ORDERBY     = tokens.create( "'orderby"),
+		GROUPBY     = tokens.create( "'groupby"),
 		
 		WORK		= tokens.create( "WORK|TRAN(SACTION)?"		),
 		ADDITIVE	= tokens.create( "\\+|-" 					),
@@ -813,10 +813,7 @@ public final class Database
 				keyword = "groupby";
 			}
 			List columns = idList();
-			System.out.println(keyword);
 			String into = null;
-			
-			System.out.println("az");
 			
 			if( in.matchAdvance(INTO) != null )
 				into = in.required(IDENTIFIER);

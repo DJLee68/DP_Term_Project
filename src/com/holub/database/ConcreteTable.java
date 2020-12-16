@@ -402,6 +402,30 @@ import com.holub.tools.ArrayIterator;
 		}
 		return deleted;
 	}
+	
+	public Table distinct(Selector where, String[] column) {
+		Table resultTable = new ConcreteTable(null, (String[]) column.clone());
+		Results currentRow = (Results) rows();
+		Cursor[] envelope = new Cursor[] { currentRow };
+		Set check_duplicate = new HashSet<Object>();
+		
+		while (currentRow.advance()) {
+			if (where.approve(envelope)) {
+				Object[] newRow = new Object[column.length];
+				for (int c = 0; c < column.length; c++) {
+					newRow[c] = currentRow.column(column[c]);
+				}
+				// 기존에 없던 경우만 insert를 함 
+				if(!check_duplicate.contains(newRow[0])) {
+					resultTable.insert(newRow);
+					check_duplicate.add(newRow[0]);
+				}
+			}
+		}
+		
+		return resultTable;
+	}
+	
 
 	// @select-start
 	// ----------------------------------------------------------------------
@@ -420,12 +444,11 @@ import com.holub.tools.ArrayIterator;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public Table select(Selector where, String[] requestedColumns) {
+	public Table select(Selector where, String keyword, String[] requestedColumns) {
 		
 		if (requestedColumns == null)
 			return select(where);
 		
-		System.out.println("hi2");
 		Table resultTable = new ConcreteTable(null, (String[]) requestedColumns.clone());
 		Results currentRow = (Results) rows();
 		Cursor[] envelope = new Cursor[] { currentRow };
@@ -439,81 +462,58 @@ import com.holub.tools.ArrayIterator;
 				resultTable.insert(newRow);
 			}
 		}
+		if(keyword=="distinct") {
+			resultTable = distinct(where, requestedColumns);
+		}
+		
 		return new UnmodifiableTable(resultTable);
 	}
 	
 
-	public Table select(Selector where, Table[] otherTables){
+	public Table select(Selector where, String keyword, Table[] otherTables){
 
 
-		// Make the current table not be a special case by effectively
-		// prefixing it to the otherTables array.
 		Table[] allTables = new Table[otherTables.length + 1];
 		allTables[0] = this;
 		System.arraycopy(otherTables, 0, allTables, 1, otherTables.length);
 		
-		// Create places to hold the result of the join and to hold
-		// iterators for each table involved in the join.
 		ArrayList<String> columns = new ArrayList<>();
+		
+		// 각 테이블의 컬럼이름을 ArrayList에 추가 
 		columns.addAll(Arrays.asList(columnNames.clone()));
-
-
 		for(int i=0; i<otherTables.length; i++) {
 			columns.addAll(Arrays.asList(otherTables[i].get_columnNames()));
 		}
 		
+		// 중복되는 컬럼이름 제거 
 		HashSet<String> delete_duplicate = new HashSet<String>(columns);
 		ArrayList<String> unique_columns = new ArrayList<String>(delete_duplicate);
 		String[] requestedColumns = unique_columns.toArray(new String[0]);
-	
 		
 		Table resultTable = new ConcreteTable(null, requestedColumns);
-		
 		Cursor[] envelope = new Cursor[allTables.length];
-		// Recursively compute the Cartesian product, adding to the
-		// resultTable all rows that the Selector approves
+
 
 		selectFromCartesianProduct(0, where, requestedColumns, allTables, envelope, resultTable);
-		return new UnmodifiableTable(resultTable);
-	}
-
-	// HERE!!!
-	public Table select(Selector where, String[] requestedColumns, // {=ConcreteTable.select.default}
-			Table[] otherTables) {
-
-		// If we're not doing a join, use the more efficient version
-		// of select().
-		
-		if (otherTables == null || otherTables.length == 0)
-			return select(where, requestedColumns);
-		if (requestedColumns == null) {
-			System.out.println("?");
-			return select(where, otherTables);
+		if(keyword=="distinct") {
+			resultTable = distinct(where, requestedColumns);
 		}
-		// Make the current table not be a special case by effectively
-		// prefixing it to the otherTables array.
-		Table[] allTables = new Table[otherTables.length + 1];
-		allTables[0] = this;
-		System.arraycopy(otherTables, 0, allTables, 1, otherTables.length);
-		// Create places to hold the result of the join and to hold
-		// iterators for each table involved in the join.
-		Table resultTable = new ConcreteTable(null, requestedColumns);
 		
-		Cursor[] envelope = new Cursor[allTables.length];
-		// Recursively compute the Cartesian product, adding to the
-		// resultTable all rows that the Selector approves
-
-		selectFromCartesianProduct(0, where, requestedColumns, allTables, envelope, resultTable);
 		return new UnmodifiableTable(resultTable);
 	}
+
 
 	public Table select(Selector where, String keyword, String[] requestedColumns, // {=ConcreteTable.select.default}
 			Table[] otherTables) {
 
 		// If we're not doing a join, use the more efficient version
 		// of select().
-		if (keyword==null) return select(where, requestedColumns, otherTables);
-		System.out.println("zz");
+		
+		if (otherTables == null || otherTables.length == 0)
+			return select(where, keyword, requestedColumns);
+		if (requestedColumns == null) {
+			return select(where, keyword, otherTables);
+		}
 		// Make the current table not be a special case by effectively
 		// prefixing it to the otherTables array.
 		Table[] allTables = new Table[otherTables.length + 1];
@@ -526,11 +526,15 @@ import com.holub.tools.ArrayIterator;
 		Cursor[] envelope = new Cursor[allTables.length];
 		// Recursively compute the Cartesian product, adding to the
 		// resultTable all rows that the Selector approves
-
 		selectFromCartesianProduct(0, where, requestedColumns, allTables, envelope, resultTable);
+		if(keyword=="distinct") {
+			resultTable = distinct(where, requestedColumns);
+		}
+		
 		return new UnmodifiableTable(resultTable);
 	}
-	
+
+
 	/**
 	 * Think of the Cartesian product as a kind of tree. That is given one table
 	 * with rows A and B, and another table with rows C and D, you can look at the
@@ -614,8 +618,24 @@ import com.holub.tools.ArrayIterator;
 	 */
 	
 	public Table select(Selector where, Collection requestedColumns, Collection other) {
-		// TODO Auto-generated method stub
-		return select(where, requestedColumns, other);
+		String[] columnNames = null;
+		Table[] otherTables = null;
+	
+		if (requestedColumns != null) // SELECT *
+		{
+			// Can't cast an Object[] to a String[], so make a copy to ensure
+			// type safety.
+			columnNames = new String[requestedColumns.size()];
+			int i = 0;
+			Iterator column = requestedColumns.iterator();
+
+			while (column.hasNext())
+				columnNames[i++] = column.next().toString();
+		}
+
+		if (other != null)
+			otherTables = (Table[]) other.toArray(new Table[other.size()]);
+		return select(where, "", columnNames, otherTables);
 	}
 	
 	public Table select(Selector where, String keyword, Collection requestedColumns, Collection other) {
@@ -642,7 +662,7 @@ import com.holub.tools.ArrayIterator;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public Table select(Selector where, Collection requestedColumns) {
-		return select(where, requestedColumns, null);
+		return select(where, "", requestedColumns, null);
 	}
 
 	// @select-end
@@ -999,6 +1019,24 @@ import com.holub.tools.ArrayIterator;
 				System.out.println("");
 			}
 		}
+	}
+
+	@Override
+	public Table select(Selector where, String[] requestedColumns, Table[] other) {
+		// TODO Auto-generated method stub
+		return select(where, "", requestedColumns, other);
+	}
+
+	@Override
+	public Table select(Selector where, Table[] otherTables) {
+		// TODO Auto-generated method stub
+		return select(where, "", otherTables);
+	}
+
+	@Override
+	public Table select(Selector where, String[] requestedColumns) {
+		// TODO Auto-generated method stub
+		return select(where, "", requestedColumns, null);
 	}
 
 }

@@ -26,6 +26,7 @@ public class XMLImporter implements Importer {
 	private NodeList nodes;
 	private int row_cnt = 0;
 	
+	// 생성자가 불릴 때 XML 파일 형식을 위한 세팅을 함 
 	public XMLImporter(String filename) {
 		docfactory = DocumentBuilderFactory.newInstance();
 		try {
@@ -51,6 +52,7 @@ public class XMLImporter implements Importer {
 	public void startTable() throws IOException {
 		// TODO Auto-generated method stub
 		
+		// XML의 각 컬럼 정보를 세팅함 
 		for(int i = 0; i < nodes.getLength(); i++){
 			Node node = nodes.item(i);
 			if(node.getNodeType() == Node.ELEMENT_NODE){ // 해당 노드의 종류 판정(Element일 때)
@@ -77,13 +79,11 @@ public class XMLImporter implements Importer {
 	@Override
 	public int loadWidth() throws IOException {
 		// TODO Auto-generated method stub
-		System.out.println(columnNames.size());
 		return columnNames.size();
 	}
 
 	@Override
 	public Iterator loadColumnNames() throws IOException {
-//		System.out.println(columnNames);
 		// TODO Auto-generated method stub
 		return columnNames.iterator();
 	}
@@ -91,40 +91,28 @@ public class XMLImporter implements Importer {
 	@Override
 	public Iterator loadRow() throws IOException {
 		List<String> rows = new ArrayList<String>();
-//		System.out.println("a"+nodes.getLength()+"a");
+		// 노드의 개수만큼 순회 
 		for(; row_cnt < nodes.getLength(); row_cnt++){
-//			System.out.println("cnt"+row_cnt);
 			Node node = nodes.item(row_cnt);
 			if(node.getNodeType() == Node.ELEMENT_NODE){ // 해당 노드의 종류 판정(Element일 때)
-//				System.out.println("a");
 				Element ele = (Element)node;
 				String nodeName = ele.getNodeName();
-				if(nodeName.equals("row")){
-//					System.out.println("b");
+				if(nodeName.equals("row")){ //해당 노드의 이름이 'row'일 때
 					NodeList childeren2 = ele.getChildNodes();
-//					System.out.println(childeren2.getLength()+"a");
-					for(int a = 0; a < childeren2.getLength(); a++){
-//						System.out.println("c");
+					for(int a = 0; a < childeren2.getLength(); a++){ // 각 row의 컬럼들의 값을 순회 
 						Node node2 = childeren2.item(a);
-						
 						if(node2.getNodeType() == Node.ELEMENT_NODE){
-		
 							Element ele2 = (Element)node2;
 							String nodeName2 = ele2.getNodeName();
-							rows.add(ele2.getAttribute("value"));
-		//					System.out.println("node name2: " + nodeName2);
-		//					System.out.println("node attribute2: " + ele2.getAttribute("value"));
+							rows.add(ele2.getAttribute("value")); // 각 row의 각 컬럼들의 값을 추가 
 						}
 					}
 					row_cnt++;
 					break;
 				}
 			}
-//			System.out.println(row_cnt);
-			
 		}
 		// TODO Auto-generated method stub
-//		System.out.println(rows);
 		if(rows.size()==0) return null;
 		else {
 			System.out.println(rows);

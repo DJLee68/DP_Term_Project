@@ -3,7 +3,6 @@ package com.holub.database;
 import java.io.*;	
 import java.util.*;
 
-
 public class HTMLExporter implements Table.Exporter {
 	private final Writer out;
 	public HTMLExporter(Writer out) {
@@ -20,20 +19,17 @@ public class HTMLExporter implements Table.Exporter {
 							   Iterator columnNames ) throws IOException
 	{	
 		this.width = width;
+		// 테이블의 이름 작성 
 		out.write(tableName == null ? "<anonymous>" : tableName );
 		out.write("<p>");
-		
-//		storeRow( columnNames ); // comma separated list of columns ids
 }
 
 	public void storeRow( Iterator data ) throws IOException
 	{	int i = width;
 		while( data.hasNext() )
-		{	Object datum = data.next();
-
-			// Null columns are represented by an empty field
-			// (two commas in a row). There's nothing to write
-			// if the column data is null.
+		{	
+			// 데이터 작성 
+			Object datum = data.next();
 			if( datum != null )	{
 				out.write( datum.toString() );
 			}
@@ -52,18 +48,22 @@ public class HTMLExporter implements Table.Exporter {
 	public static class Test
 	{ 	public static void main( String[] args ) throws IOException
 		{	
+			// Export할 테이블 생성  
 			Table people = TableFactory.create( "people",
 						   new String[]{ "First", "Last"		} );
 			people.insert( new String[]{ "Allen",	"Holub" 	} );
 			people.insert( new String[]{ "Ichabod",	"Crane" 	} );
 			people.insert( new String[]{ "Rip",		"VanWinkle" } );
 			people.insert( new String[]{ "Goldie",	"Locks" 	} );
-		    
+			
 			Writer out = new FileWriter( "people.html" );
 			
-			HTMLExporter tableBuilder = new HTMLExporter( out );
+			// ConcreteBuilder 부름 
+			Table.Exporter tableBuilder = new HTMLExporter( out );
+			
+			// Build a HTML product
 			people.export( tableBuilder );
-
+			
 			out.close();
 		}
 	}
